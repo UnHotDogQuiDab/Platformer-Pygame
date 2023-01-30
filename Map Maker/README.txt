@@ -1,0 +1,1 @@
+You map must be 20/20 tile, and your pixels must be  (for now)
