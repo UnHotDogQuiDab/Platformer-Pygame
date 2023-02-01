@@ -1,7 +1,5 @@
 import pygame
-from World import World, screen, spike_group, blocker_group, platform_up_group
-
-world = World()
+from World import World, screen, spike_group, blocker_group, platform_up_group, key_group, exit_door_group
 
 
 class Player:
@@ -14,13 +12,13 @@ class Player:
         self.index = 0
         self.counter = 0
         for i in range(1, 5):
-            player_img_right = pygame.image.load(f'Platformer sprites/Base pack/player/GUY/guy{i}.png')
+            player_img_right = pygame.image.load(f'Usefull_img/GUY/guy{i}.png')
             player_img_right = pygame.transform.scale(player_img_right, (45, 90))
             player_img_left = pygame.transform.flip(player_img_right, True, False)
             self.images_left.append(player_img_left)
             self.images_right.append(player_img_right)
         self.image = self.images_right[self.index]
-        player_image_death = pygame.image.load(f'Platformer sprites/Base pack/player/GUY/guy_death.png')
+        player_image_death = pygame.image.load(f'Usefull_img/GUY/guy_death.png')
         self.image_death = pygame.transform.scale(player_image_death, (90, 45))
         self.rect_death = self.image_death.get_rect()
         self.rect = self.image.get_rect()
@@ -31,6 +29,7 @@ class Player:
         self.vel_y = 0
         self.jumped = False
         self.direction = 1
+        self.world = World()
 
     def update(self, game_over):
         dx = 0
@@ -38,7 +37,7 @@ class Player:
         calm_down = 5
 
         # Mort
-        if game_over != 0:
+        if game_over == -1:
             self.rect_death.x = self.rect.x - 45
             self.rect_death.y = self.rect.y + 50
             self.image = self.image_death
@@ -85,10 +84,15 @@ class Player:
         dy += self.vel_y
 
         # Collisions
-        for tile in world.tile_list:
+        for tile in self.world.tile_list:
             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height) and tile[2] != 0:
                 dx = 0
             if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height) and tile[2] != 0:
+                for i in platform_up_group:
+                    if i.rect.colliderect(self.rect.x, self.rect.y, self.width, self.height):
+                        return -1
+                    if i.rect.colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+                        return -1
                 if self.vel_y < 0:
                     dy = tile[1].bottom - self.rect.top
                     self.vel_y = 0
@@ -97,11 +101,14 @@ class Player:
                     self.jumped = False
                     self.vel_y = 0
 
-        # Ennemis/hazards
+        # Ennemies/hazards/key
         if pygame.sprite.spritecollide(self, spike_group, False):
-            game_over = 1
+            return -1
         if pygame.sprite.spritecollide(self, blocker_group, False):
-            game_over = 1
+            return -1
+        if pygame.sprite.spritecollide(self, exit_door_group, False):
+            return 1
+
         for i in platform_up_group:
             if i.rect.colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                 dx = 0
