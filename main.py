@@ -34,7 +34,6 @@ while run:
 
     key_group.draw(screen)
     spike_group.draw(screen)
-
     exit_door_group.draw(screen)
     blocker_group.draw(screen)
     game_over = player.update(game_over)
@@ -45,24 +44,19 @@ while run:
             run = False
         if restart_button.draw():
             player.reset(get_pos_player(level)[0],  get_pos_player(level)[1])
+            world = World()
             game_over = 0
             count = 0
 
     if game_over == -1:
         count += 1
-    if game_over != 0:
-        platform_up_group = []
-        blocker_group.empty()
-        spike_group.empty()
-        key_group.empty()
-        exit_door_group.empty()
 
     if game_over == 1:
         level += 1
         reset_level(level)
+        player.reset(get_pos_player(level)[0],  get_pos_player(level)[1])
         game_over = 0
         world = World()
-        player.reset(get_pos_player(level)[0],  get_pos_player(level)[1])
 
     if count >= 120:
         screen.fill([255, 255, 255])
@@ -72,8 +66,8 @@ while run:
         if restart_button.draw():
             level = 1
             reset_level(level)
-            world = World()
             player.reset(get_pos_player(level)[0],  get_pos_player(level)[1])
+            world = World()
             game_over = 0
             count = 0
 

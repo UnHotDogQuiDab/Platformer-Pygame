@@ -38,7 +38,6 @@ def reset_level(level):
     tmx_data = pytmx.util_pygame.load_pygame(f'level_data/level_{level}.tmx')
     player_position_x = (tmx_data.get_object_by_name("Player_spawn").x/64) * tile_size
     player_position_y = (tmx_data.get_object_by_name("Player_spawn").y/64) * tile_size
-    print((player_position_x, player_position_y))
     for layer in tmx_data:
         if layer.name == 'Usefull':
             data = layer.data
@@ -52,6 +51,14 @@ def reset_level(level):
 
 class World:
     def __init__(self):
+        global platform_up_group
+        global blocker_groupqz
+        global exit_door_group
+        platform_up_group.clear()
+        blocker_group.empty()
+        spike_group.empty()
+        key_group.empty()
+        exit_door_group.empty()
         self.tile_list = []
 
         sky_img = pygame.image.load('Usefull_img/bg.png')

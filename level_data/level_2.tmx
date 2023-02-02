@@ -25,7 +25,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="2" name="Usefull" width="20" height="20" visible="0">
+ <layer id="2" name="Usefull" width="20" height="20">
   <data encoding="csv">
 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
 4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,

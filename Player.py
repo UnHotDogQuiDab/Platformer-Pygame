@@ -1,5 +1,5 @@
 import pygame
-from World import World, screen, spike_group, blocker_group, platform_up_group, key_group, exit_door_group
+from World import World, screen, spike_group, blocker_group, platform_up_group, key_group, exit_door_group, screen_height
 
 
 class Player:
@@ -100,6 +100,9 @@ class Player:
                     dy = tile[1].top - self.rect.bottom
                     self.jumped = False
                     self.vel_y = 0
+
+        if self.rect.y+dy >= screen_height:
+            return -1
 
         # Ennemies/hazards/key
         if pygame.sprite.spritecollide(self, spike_group, False):
