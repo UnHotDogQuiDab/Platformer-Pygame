@@ -1,5 +1,9 @@
-Tiles from
-"cite tes sources"
 Run launch.bat to play the game
-If you don't have python installed, you need to type python.exe in the windows cmd to install it, then run the programm.
+
+If you don't have python installed, the download for python 3.9 will open itself.
+Download it and press a key in the launch.bat command window
+
+Tiles from
+https://kenney.nl/assets/platformer-art-deluxe
+
 Have fun
