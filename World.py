@@ -2,7 +2,7 @@ import pygame
 import pytmx
 from Enemy import Enemy
 from Hazards import Spike, Platform_up
-from Trigger import Key, Exit_door
+from Trigger import Key, Exit_door, Locker
 
 tile_size = 50
 screen_width = 1000
@@ -13,9 +13,10 @@ pygame.display.set_caption('Platformer')
 
 world_data = []
 platform_up_group = []
+key_group = []
+locker_group = []
 blocker_group = pygame.sprite.Group()
 spike_group = pygame.sprite.Group()
-key_group = pygame.sprite.Group()
 exit_door_group = pygame.sprite.Group()
 
 tmx_data = pytmx.util_pygame.load_pygame(f'level_data/level_1.tmx')
@@ -31,6 +32,7 @@ def get_pos_player(level):
 
 
 def reset_level(level):
+    print(level)
     global world_data
     global player_position_x
     global player_position_y
@@ -51,13 +53,11 @@ def reset_level(level):
 
 class World:
     def __init__(self):
-        global platform_up_group
-        global blocker_groupqz
-        global exit_door_group
         platform_up_group.clear()
         blocker_group.empty()
         spike_group.empty()
-        key_group.empty()
+        key_group.clear()
+        locker_group.clear()
         exit_door_group.empty()
         self.tile_list = []
 
@@ -120,7 +120,18 @@ class World:
 
                 elif tile == 6:
                     yellow_key = Key(col_count * tile_size, row_count * tile_size, 1)
-                    key_group.add(yellow_key)
+                    key_group.append(yellow_key)
+
+                    img = pygame.transform.scale(sky_img, (tile_size, tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * tile_size
+                    img_rect.y = row_count * tile_size
+                    tile = (img, img_rect, 0)
+                    self.tile_list.append(tile)
+
+                elif tile == 7:
+                    yellow_locker = Locker(col_count * tile_size, row_count * tile_size)
+                    locker_group.append(yellow_locker)
 
                     img = pygame.transform.scale(sky_img, (tile_size, tile_size))
                     img_rect = img.get_rect()

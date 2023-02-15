@@ -1,5 +1,6 @@
 import pygame
-from World import World, screen, spike_group, blocker_group, platform_up_group, key_group, exit_door_group, screen_height
+from World import World, screen, spike_group, blocker_group, locker_group, platform_up_group, key_group, exit_door_group, screen_height
+from Trigger import locked
 
 
 class Player:
@@ -46,18 +47,18 @@ class Player:
 
         # Touches
         key = pygame.key.get_pressed()
-        if key[pygame.K_z] and not self.jumped:
+        if (key[pygame.K_z] or key[pygame.K_UP]) and not self.jumped:
             self.vel_y -= 15
             self.jumped = True
 
-        if key[pygame.K_q]:
+        if key[pygame.K_q] or key[pygame.K_LEFT]:
             dx -= 5
             self.direction = -1
-        if key[pygame.K_d]:
+        if key[pygame.K_d] or key[pygame.K_RIGHT]:
             dx += 5
             self.direction = 1
 
-        if not key[pygame.K_q] and not key[pygame.K_d]:
+        if not (key[pygame.K_q] or key[pygame.K_LEFT]) and not (key[pygame.K_d] or key[pygame.K_RIGHT]):
             self.counter = 0
             self.index = 0
             if self.direction == -1:
@@ -112,7 +113,24 @@ class Player:
         if pygame.sprite.spritecollide(self, exit_door_group, False):
             return 1
 
+        for keys in key_group:
+            if keys.rect.colliderect(self.rect.x, self.rect.y, self.width, self.height):
+                if keys.idKey not in locked:
+                    locked.append(keys.idKey)
+
         for i in platform_up_group:
+            if i.rect.colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
+                dx = 0
+            if i.rect.colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+                if self.vel_y < 0:
+                    dy = i.rect.bottom - self.rect.top
+                    self.vel_y = 0
+                elif self.vel_y >= 0:
+                    dy = i.rect.top - self.rect.bottom-1
+                    self.jumped = False
+                    self.vel_y = 0
+
+        for i in locker_group:
             if i.rect.colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
                 dx = 0
             if i.rect.colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):

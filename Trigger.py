@@ -1,5 +1,5 @@
 import pygame
-locked = {}
+locked = []
 
 
 class Exit_door(pygame.sprite.Sprite):
@@ -21,6 +21,11 @@ class Key(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.idKey = idKey
+
+    def update(self):
+        if self.idKey in locked:
+            return True
+        return False
 
 
 class Locker(pygame.sprite.Sprite):

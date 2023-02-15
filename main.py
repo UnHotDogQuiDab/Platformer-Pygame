@@ -1,11 +1,11 @@
 import pygame
-from World import World, blocker_group, screen, spike_group, platform_up_group, key_group, exit_door_group, reset_level, get_pos_player
+from World import World, blocker_group, screen, spike_group, platform_up_group, key_group, exit_door_group, locker_group, reset_level, get_pos_player
 from Player import Player
 from Button import Button
 
 pygame.init()
 game_over = 0
-level = 1
+level = 5
 reset_level(level)
 
 game_over_img = pygame.transform.scale(pygame.image.load("Usefull_img/GAME_OVER.jpg"), (600, 100))
@@ -24,15 +24,25 @@ clock = pygame.time.Clock()
 run = True
 while run:
     world.draw()
+    for j in key_group:
+        picked = j.update()
+        if not picked:
+            screen.blit(j.image, j.rect)
+        else:
+            key_group.remove(j)
+
+    for k in locker_group:
+        if not picked:
+            screen.blit(k.image, k.rect)
+        else:
+            locker_group.remove(k)
 
     for i in platform_up_group:
-        if game_over == 0:
-            i.update()
+        i.update()
         screen.blit(i.image, i.rect)
     if game_over == 0:
         blocker_group.update()
 
-    key_group.draw(screen)
     spike_group.draw(screen)
     exit_door_group.draw(screen)
     blocker_group.draw(screen)
