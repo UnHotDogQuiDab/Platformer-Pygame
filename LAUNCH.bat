@@ -3,6 +3,7 @@
 pip install pygame --pre
 IF %ERRORLEVEL% NEQ 0 goto fix
 pip install pytmx --pre
+pip install pyscroll --pre
 python.exe main.py
 pause
 exit

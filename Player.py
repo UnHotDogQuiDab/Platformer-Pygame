@@ -1,13 +1,13 @@
 import pygame
-from World import World, screen, spike_group, blocker_group, locker_group, platform_up_group, key_group, exit_door_group, screen_height
+from World import screen, spike_group, blocker_group, locker_group, platform_up_group, key_group, exit_door_group, screen_height
 from Trigger import locked
 
 
 class Player:
-    def __init__(self, x, y):
-        self.reset(x, y)
+    def __init__(self, x, y, world):
+        self.reset(x, y, world)
 
-    def reset(self, x, y):
+    def reset(self, x, y, world):
         self.images_right = []
         self.images_left = []
         self.index = 0
@@ -30,7 +30,7 @@ class Player:
         self.vel_y = 0
         self.jumped = False
         self.direction = 1
-        self.world = World()
+        self.world = world
 
     def update(self, game_over):
         dx = 0
@@ -42,7 +42,8 @@ class Player:
             self.rect_death.x = self.rect.x - 45
             self.rect_death.y = self.rect.y + 50
             self.image = self.image_death
-            screen.blit(self.image, self.rect_death)
+            rect_affichage = [self.rect_death.x - self.world.offset.x, self.rect_death.y - self.world.offset.y]
+            screen.blit(self.image, rect_affichage)
             return game_over
 
         # Touches
@@ -86,7 +87,7 @@ class Player:
 
         # Collisions
         for tile in self.world.tile_list:
-            if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height) and tile[2] != 0:
+            if (tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height) and tile[2] != 0) or self.rect.x + dx < 0:
                 dx = 0
             if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height) and tile[2] != 0:
                 for i in platform_up_group:
@@ -145,6 +146,7 @@ class Player:
         # Affichage
         self.rect.x += dx
         self.rect.y += dy
-        screen.blit(self.image, self.rect)
-
+        offset = self.world.offset
+        rect_affichage = [self.rect.x - offset.x, self.rect.y - offset.y]
+        screen.blit(self.image, rect_affichage)
         return game_over

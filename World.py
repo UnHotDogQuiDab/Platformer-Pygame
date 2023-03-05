@@ -2,7 +2,7 @@ import pygame
 import pytmx
 from Enemy import Enemy
 from Hazards import Spike, Platform_up
-from Trigger import Key, Exit_door, Locker
+from Trigger import Key, Exit_door, Locker, locked
 
 tile_size = 50
 screen_width = 1000
@@ -15,13 +15,14 @@ world_data = []
 platform_up_group = []
 key_group = []
 locker_group = []
-blocker_group = pygame.sprite.Group()
-spike_group = pygame.sprite.Group()
-exit_door_group = pygame.sprite.Group()
+blocker_group = []
+spike_group = []
+exit_door_group = []
 
 tmx_data = pytmx.util_pygame.load_pygame(f'level_data/level_1.tmx')
 player_position_x = (tmx_data.get_object_by_name("Player_spawn").x/64)*tile_size
 player_position_y = (tmx_data.get_object_by_name("Player_spawn").y/64)*tile_size
+border_x = tmx_data.get_object_by_name("Border").x
 
 
 def get_pos_player(level):
@@ -32,14 +33,15 @@ def get_pos_player(level):
 
 
 def reset_level(level):
-    print(level)
     global world_data
     global player_position_x
     global player_position_y
+    global border_x
     world_data = []
     tmx_data = pytmx.util_pygame.load_pygame(f'level_data/level_{level}.tmx')
     player_position_x = (tmx_data.get_object_by_name("Player_spawn").x/64) * tile_size
     player_position_y = (tmx_data.get_object_by_name("Player_spawn").y/64) * tile_size
+    border_x = tmx_data.get_object_by_name("Border").x - 20 * 64
     for layer in tmx_data:
         if layer.name == 'Usefull':
             data = layer.data
@@ -53,13 +55,15 @@ def reset_level(level):
 
 class World:
     def __init__(self):
+        locked.clear()
         platform_up_group.clear()
-        blocker_group.empty()
-        spike_group.empty()
+        blocker_group.clear()
+        spike_group.clear()
         key_group.clear()
         locker_group.clear()
-        exit_door_group.empty()
+        exit_door_group.clear()
         self.tile_list = []
+        self.offset = pygame.math.Vector2()
 
         sky_img = pygame.image.load('Usefull_img/bg.png')
         grass_img = pygame.image.load('Usefull_img/grassMid.png')
@@ -87,7 +91,7 @@ class World:
 
                 elif tile == 3:
                     blocker = Enemy(col_count * tile_size, row_count * tile_size + 10)
-                    blocker_group.add(blocker)
+                    blocker_group.append(blocker)
 
                     img = pygame.transform.scale(sky_img, (tile_size, tile_size))
                     img_rect = img.get_rect()
@@ -98,7 +102,7 @@ class World:
 
                 elif tile == 4:
                     spike = Spike(col_count * tile_size, row_count * tile_size)
-                    spike_group.add(spike)
+                    spike_group.append(spike)
 
                     img = pygame.transform.scale(sky_img, (tile_size, tile_size))
                     img_rect = img.get_rect()
@@ -142,7 +146,7 @@ class World:
 
                 elif tile == 8:
                     exit_door = Exit_door(col_count * tile_size, row_count * tile_size)
-                    exit_door_group.add(exit_door)
+                    exit_door_group.append(exit_door)
 
                     img = pygame.transform.scale(sky_img, (tile_size, tile_size))
                     img_rect = img.get_rect()
@@ -161,6 +165,13 @@ class World:
                 col_count += 1
             row_count += 1
 
-    def draw(self):
+    def draw(self, player):
+        self.offset = pygame.math.Vector2()
+        self.offset.x = player.rect.centerx - (screen_width//2)
+        if self.offset.x < 0:
+            self.offset.x = 0
+        if self.offset.x > border_x:
+            self.offset.x = border_x
         for tile in self.tile_list:
-            screen.blit(tile[0], tile[1])
+            offset_pos = tile[1].topleft - self.offset
+            screen.blit(tile[0], offset_pos)
